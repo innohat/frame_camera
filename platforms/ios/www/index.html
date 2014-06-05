@@ -33,6 +33,19 @@
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
+            <hr>
+            <button id="openCustomCameraBtn">Open Custom Camera</button>
+            <img id="photoImg" style="position: fixed; top: 0; width: 50%; left: 25%;" />
+            <script src="js/custom_camera.js"></script>
+            <script>
+              document.getElementById("openCustomCameraBtn").addEventListener("click", function(){
+                FrameCamera.getPicture(function(imagePath){
+                  document.getElementById("photoImg").setAttribute("src", imagePath);
+                }, function(){
+                  alert("Photo cancelled");
+                });
+              }, false);
+              </script>
         </div>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>

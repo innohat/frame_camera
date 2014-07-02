@@ -28,26 +28,24 @@
     </head>
     <body>
         <div class="app">
-            <h1>Apache Cordova</h1>
+            <h1>PhoneGap</h1>
             <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
-            <hr>
             <button id="openCustomCameraBtn">Open Custom Camera</button>
-            <img id="photoImg" style="position: fixed; top: 0; width: 50%; left: 25%;" />
-            <script src="js/custom_camera.js"></script>
+            <script src="js/customcamera.js"></script>
             <script>
-              document.getElementById("openCustomCameraBtn").addEventListener("click", function(){
-                FrameCamera.getPicture(function(imagePath){
-                  document.getElementById("photoImg").setAttribute("src", imagePath);
-                }, function(){
-                  alert("Photo cancelled");
+            document.getElementById("openCustomCameraBtn").addEventListener("click", function() {
+                customCamera.getPicture("latest_scan.jpg", function(imagePath) {
+                    alert("File path: " + imagePath);
+                }, function(error) {
+                    alert(error);
                 });
-              }, false);
-              </script>
+            }, false);
+            </script>
         </div>
-        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.leadoff.plugins.camera"
+    id="com.innohat.plugins.camera"
     version="1.1">
 
-    <name>Custom Camera</name>
-    <description>Custom Camera Plugin</description>
+    <name>Frame Camera</name>
+    <description>Custom Frame Camera Plugin</description>
     <license>Apache 2.0</license>
     <keywords>custom,camera</keywords>
 
@@ -44,7 +44,7 @@
         <activity android:name="com.performanceactive.plugins.camera.CustomCameraActivity" android:screenOrientation="portrait" android:configChanges="orientation">
         </activity>
     </config-file>
-    <source-file src="platforms/android/src/com/performanceactive/plugins/camera/CustomCamera.java" target-dir="src/com/performanceactive/plugins/camera" />      
+    <source-file src="platforms/android/src/com/performanceactive/plugins/camera/CustomCamera.java" target-dir="src/com/performanceactive/plugins/camera" />
     <source-file src="platforms/android/src/com/performanceactive/plugins/camera/CustomCameraActivity.java" target-dir="src/com/performanceactive/plugins/camera" />
     <source-file src="platforms/android/src/com/performanceactive/plugins/camera/CustomCameraPreview.java" target-dir="src/com/performanceactive/plugins/camera" />
 </platform>

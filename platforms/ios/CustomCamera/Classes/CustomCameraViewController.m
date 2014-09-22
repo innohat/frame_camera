@@ -11,6 +11,8 @@
 #import <Cordova/CDV.h>
 #import <AVFoundation/AVFoundation.h>
 
+#import "UIImage+fixOrientation.h"
+
 @implementation CustomCameraViewController {
     void(^_callback)(UIImage*);
     AVCaptureSession *_captureSession;
@@ -37,7 +39,7 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
         _callback = callback;
         _captureSession = [[AVCaptureSession alloc] init];
         _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
-        _frameUrl = frame;
+        _frameURL = frame;
     }
     return self;
 }
@@ -67,16 +69,16 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
 
 - (UIView*)createOverlay {
     UIView *overlay = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    
+
     _frameImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"www/img/cameraoverlay/overlay-default.png"]];
     [overlay addSubview:_frameImage];
-    
+
     _topOverlay = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"www/img/cameraoverlay/overlay-top.png"]];
     [overlay addSubview:_topOverlay];
-    
+
     _bottomOverlay = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"www/img/cameraoverlay/overlay-bottom.png"]];
     [overlay addSubview:_bottomOverlay];
-    
+
     _captureButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [_captureButton setImage:[UIImage imageNamed:@"www/img/cameraoverlay/capture_button.png"] forState:UIControlStateNormal];
     [_captureButton setImage:[UIImage imageNamed:@"www/img/cameraoverlay/capture_button_pressed.png"] forState:UIControlStateHighlighted];
@@ -88,15 +90,15 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
 
 - (void)layoutOverlayForPhone {
     CGRect bounds = [[UIScreen mainScreen] bounds];
-    
+
     _captureButton.frame = CGRectMake((bounds.size.width / 2) - (kCaptureButtonWidthPhone / 2),
                                       bounds.size.height - kCaptureButtonHeightPhone - 20,
                                       kCaptureButtonWidthPhone,
                                       kCaptureButtonHeightPhone);
-    
+
     _frameImage.frame = CGRectMake(0, (bounds.size.height - bounds.size.width) / 2,
                                    bounds.size.width, bounds.size.width);
-    
+
     _topOverlay.frame = CGRectMake(0, 0,
                                    bounds.size.width, (bounds.size.height - bounds.size.width) / 2);
     _bottomOverlay.frame = CGRectMake(0, (bounds.size.width + bounds.size.height) / 2 ,
@@ -105,19 +107,29 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
 
 - (void)layoutOverlayForTablet {
     CGRect bounds = [[UIScreen mainScreen] bounds];
-    
+
     _captureButton.frame = CGRectMake((bounds.size.width / 2) - (kCaptureButtonWidthTablet / 2),
                                       bounds.size.height - kCaptureButtonHeightTablet - 20,
                                       kCaptureButtonWidthTablet,
                                       kCaptureButtonHeightTablet);
-    
+
 }
 
 - (void)viewDidLoad {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        _frame = [UIImage imageWithData: [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:_frameURL]]];
-        [_frameImage setImage:_frame];
+        NSURLRequest * frameRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:_frameURL]
+                                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                              timeoutInterval:60.0];
+        NSURLResponse* response;
+        NSError* error = nil;
+        NSData* frameData = [NSURLConnection sendSynchronousRequest:frameRequest returningResponse:&response error:&error];
         
+        _frame = [UIImage imageWithData: frameData];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_frameImage setImage:_frame];
+        });
+
         for (AVCaptureDevice *device in [AVCaptureDevice devices]) {
             if ([device hasMediaType:AVMediaTypeVideo] && [device position] == AVCaptureDevicePositionBack) {
                 _rearCamera = device;
@@ -176,10 +188,17 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
 }
 
 - (void)takePicture {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_activityIndicator startAnimating];
+    });
     AVCaptureConnection *videoConnection = [self videoConnectionToOutput:_stillImageOutput];
     [_stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-        _callback([UIImage imageWithData:imageData]);
+        UIImage *rawImage = [[UIImage imageWithData:imageData] fixOrientation];
+        _callback([UIImage squareImageFromImage:rawImage scaledToSize: 700.0]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_activityIndicator stopAnimating];
+        });
     }];
 }
 

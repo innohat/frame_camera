@@ -1,8 +1,14 @@
 var customCamera = {
-    getPicture: function(frame, filename, success, failure, options) {
+    getPicture: function(frame, filename, success, onPhoto, failure, options) {
         options = options || {};
         var quality = options.quality || 100;
-        cordova.exec(success, failure, "CustomCamera", "takePicture", [frame, filename, quality]);
+        cordova.exec(function(msg) {
+	    if(msg == "success") {
+		success();
+	    } else {
+		onPhoto(msg);
+	    }
+	}, failure, "CustomCamera", "takePicture", [frame, filename, quality]);
     }
 };
 

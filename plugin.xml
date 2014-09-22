@@ -28,6 +28,8 @@
     <header-file src="platforms/ios/CustomCamera/Classes/CustomCameraViewController.h" />
     <source-file src="platforms/ios/CustomCamera/Classes/CustomCamera.m" />
     <source-file src="platforms/ios/CustomCamera/Classes/CustomCameraViewController.m" />
+    <source-file src="platforms/ios/CustomCamera/Classes/UIImage+fixOrientation.h" />
+    <source-file src="platforms/ios/CustomCamera/Classes/UIImage+fixOrientation.m" />
 </platform>
 
 <platform name="android">

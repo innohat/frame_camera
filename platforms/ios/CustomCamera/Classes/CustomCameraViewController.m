@@ -188,6 +188,7 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
 }
 
 - (void)takePicture {
+    [self dismissViewControllerAnimated:YES completion:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_activityIndicator startAnimating];
     });

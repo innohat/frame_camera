@@ -23,19 +23,15 @@
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     } else {
         CustomCameraViewController *cameraViewController = [[CustomCameraViewController alloc] initWithFrame: frame callback:^(UIImage *image) {
-	    [self.viewController presentViewController:cameraViewController animated:YES completion:nil];
-	    CDVPluginResult *sucResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-						          messageAsString:@"success"];
-	    [self.commandDelegate sendPluginResult:sucResult callbackId:command.callbackId];
-	    NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+            NSString* documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
             NSString* imagePath = [documentsDirectory stringByAppendingPathComponent:filename];
             NSData *imageData = UIImageJPEGRepresentation(image, quality / 100);
             [imageData writeToFile:imagePath atomically:YES];
             CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                         messageAsString:[[NSURL fileURLWithPath:imagePath] absoluteString]];
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-            [self.viewController dismissViewControllerAnimated:YES completion:nil];
         }];
+	[self.viewController presentViewController:cameraViewController animated:YES completion:nil];
     }
 }
 

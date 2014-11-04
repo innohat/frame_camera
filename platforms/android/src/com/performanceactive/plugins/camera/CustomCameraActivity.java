@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import com.performanceactive.plugins.camera.CustomCameraPreview.LayoutMode;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -41,9 +43,9 @@ public class CustomCameraActivity extends Activity {
     public static String IMAGE_URI = "ImageUri";
     public static String ERROR_MESSAGE = "ErrorMessage";
 
-    private Camera camera;
     private RelativeLayout layout;
     private FrameLayout cameraPreviewView;
+    private CustomCameraPreview cameraPreview;
     private ImageView borderTopLeft;
     private ImageView borderTopRight;
     private ImageView borderBottomLeft;
@@ -206,6 +208,7 @@ public class CustomCameraActivity extends Activity {
     }
 
     private void takePicture() {
+    	Camera camera = cameraPreview.getCamera();
         String focusMode = camera.getParameters().getFocusMode();
         if (focusMode == FOCUS_MODE_AUTO || focusMode == FOCUS_MODE_MACRO) {
             camera.autoFocus(new AutoFocusCallback() {
@@ -274,28 +277,17 @@ public class CustomCameraActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        try {
-            camera = Camera.open();
-        } catch (Exception e) {
-            finishWithError("Camera is not accessible");
-        }
-        if (camera != null) {
-            displayCameraPreview();
-        } else {
-            finishWithError("Could not display camera preview");
-        }
+        displayCameraPreview();
     }
 
     private void displayCameraPreview() {
-        cameraPreviewView.addView(new CustomCameraPreview(this, camera));
+    	cameraPreview = new CustomCameraPreview(this, 0, LayoutMode.FitToParent);
+        cameraPreviewView.addView(cameraPreview);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (camera != null) {
-            camera.release();
-        }
     }
 
 }

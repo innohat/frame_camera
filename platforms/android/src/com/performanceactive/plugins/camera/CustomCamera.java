@@ -29,8 +29,8 @@ public class CustomCamera extends CordovaPlugin {
 	    this.callbackContext = callbackContext;
 	    Context context = cordova.getActivity().getApplicationContext();
 	    Intent intent = new Intent(context, CustomCameraActivity.class);
-	    intent.putExtra(FILENAME, args.getString(0));
-	    intent.putExtra(QUALITY, args.getInt(1));
+	    intent.putExtra(FILENAME, args.getString(1));
+	    intent.putExtra(QUALITY, args.getInt(2));
 	    cordova.startActivityForResult(this, intent, 0);
         return true;
     }

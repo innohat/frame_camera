@@ -37,7 +37,7 @@
             <script src="js/customcamera.js"></script>
             <script>
             document.getElementById("openCustomCameraBtn").addEventListener("click", function() {
-                customCamera.getPicture("latest_scan.jpg", function(imagePath) {
+                 customCamera.getPicture("http://res.cloudinary.com/dood/image/upload/v1410932305/Manhattan_Frame_2_1_qqqhe7.png", "latest_scan.jpg", function(imagePath) {
                     alert("File path: " + imagePath);
                 }, function(error) {
                     alert(error);

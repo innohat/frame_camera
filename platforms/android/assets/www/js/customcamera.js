@@ -1,8 +1,8 @@
 var customCamera = {
-    getPicture: function(filename, success, failure, options) {
+    getPicture: function(frame, filename, success, failure, options) {
         options = options || {};
         var quality = options.quality || 100;
-        cordova.exec(success, failure, "CustomCamera", "takePicture", [filename, quality]);
+        cordova.exec(success, failure, "CustomCamera", "takePicture", [frame, filename, quality]);
     }
 };
 

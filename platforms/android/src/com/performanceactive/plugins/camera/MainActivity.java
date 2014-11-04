@@ -19,19 +19,26 @@
 
 package com.performanceactive.plugins.camera;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
+import android.webkit.WebView;
 
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaActivity;
 
 public class MainActivity extends CordovaActivity {
-    @Override
+    @SuppressLint("NewApi") @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.init();
         // Set by <content src="index.html" /> in config.xml
         super.loadUrl(Config.getStartUrl());
         //super.loadUrl("file:///android_asset/www/index.html")
+        
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
     }
 }
 

@@ -4,9 +4,13 @@ package com.performanceactive.plugins.camera;
 import static android.hardware.Camera.Parameters.FOCUS_MODE_AUTO;
 import static android.hardware.Camera.Parameters.FOCUS_MODE_MACRO;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import com.performanceactive.plugins.camera.CustomCameraPreview.LayoutMode;
 
@@ -16,12 +20,16 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -40,16 +48,16 @@ public class CustomCameraActivity extends Activity {
 
     public static String FILENAME = "Filename";
     public static String QUALITY = "Quality";
+    public static String FRAME_URI = "FrameUri";
     public static String IMAGE_URI = "ImageUri";
     public static String ERROR_MESSAGE = "ErrorMessage";
 
     private RelativeLayout layout;
     private FrameLayout cameraPreviewView;
     private CustomCameraPreview cameraPreview;
-    private ImageView borderTopLeft;
-    private ImageView borderTopRight;
-    private ImageView borderBottomLeft;
-    private ImageView borderBottomRight;
+    private ImageView borderTop;
+    private ImageView borderBottom;
+    private ImageView frame;
     private ImageButton captureButton;
 
     @Override
@@ -62,13 +70,13 @@ public class CustomCameraActivity extends Activity {
         layout.setLayoutParams(layoutParams);
         
         createCameraPreview();
-        createTopLeftBorder();
-        createTopRightBorder();
-        createBottomLeftBorder();
-        createBottomRightBorder();
+        createTopBorder();
+        createFrame();
+        createBottomBorder();
         //layoutBottomBorderImagesRespectingAspectRatio();
         createCaptureButton();
         setContentView(layout);
+        
     }
 
     private void createCameraPreview() {
@@ -77,30 +85,44 @@ public class CustomCameraActivity extends Activity {
         cameraPreviewView.setLayoutParams(layoutParams);
         layout.addView(cameraPreviewView);
     }
+    
+    private void createFrame() {
+    	int width = getResources().getDisplayMetrics().widthPixels;
+    	int height = getResources().getDisplayMetrics().heightPixels;
+    	
+		frame = new ImageView(this);
+		frame.setScaleType(ScaleType.FIT_XY);
 
-    private void createTopLeftBorder() {
-		borderTopLeft = new ImageView(this);
-		
-		borderTopLeft.setAlpha(0.7f);
-		borderTopLeft.setScaleX(2.9f);
-		borderTopLeft.setScaleY(2.9f);
-
-        setBitmap(borderTopLeft, "carre-camera-1500.png");
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-        borderTopLeft.setLayoutParams(layoutParams);
-        borderTopLeft.setTranslationY(dpToPixels(-(75/2))); 
+        setFrameBitmapRemote(getIntent().getStringExtra(FRAME_URI));
         
-        layout.addView(borderTopLeft);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, width);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        frame.setLayoutParams(layoutParams);
+        
+        layout.addView(frame);
     }
 
-    private void createTopRightBorder() {
-        borderTopRight = new ImageView(this);
-        //setBitmap(borderTopRight, "border_top_right.png");
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+    private void createTopBorder() {
+    	int width = getResources().getDisplayMetrics().widthPixels;
+    	int height = getResources().getDisplayMetrics().heightPixels;
+    	
+		borderTop = new ImageView(this);
+		borderTop.setScaleType(ScaleType.FIT_XY);
+
+        setBitmap(borderTop, "overlay-top.png");
+        
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, height / 2 - width / 2);
+        borderTop.setLayoutParams(layoutParams);
+        
+        layout.addView(borderTop);
+    }
+
+//    private void createTopRightBorder() {
+//        borderTopRight = new ImageView(this);
+//        setBitmap(borderTopRight, "border_top_right.png");
+//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
+//        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+//        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 //        if (isXLargeScreen()) {
 //            layoutParams.topMargin = dpToPixels(100);
 //            layoutParams.rightMargin = dpToPixels(100);
@@ -111,16 +133,16 @@ public class CustomCameraActivity extends Activity {
 //            layoutParams.topMargin = dpToPixels(10);
 //            layoutParams.rightMargin = dpToPixels(10);
 //        }
-        borderTopRight.setLayoutParams(layoutParams);
-        layout.addView(borderTopRight);
-    }
+//        borderTopRight.setLayoutParams(layoutParams);
+//        layout.addView(borderTopRight);
+//    }
 
-    private void createBottomLeftBorder() {
-        borderBottomLeft = new ImageView(this);
-        //setBitmap(borderBottomLeft, "border_bottom_left.png");
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+    private void createBottomBorder() {
+//        borderBottomLeft = new ImageView(this);
+//        setBitmap(borderBottomLeft, "border_bottom_left.png");
+//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
+//        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 //        if (isXLargeScreen()) {
 //            layoutParams.leftMargin = dpToPixels(100);
 //        } else if (isLargeScreen()) {
@@ -128,25 +150,21 @@ public class CustomCameraActivity extends Activity {
 //        } else {
 //            layoutParams.leftMargin = dpToPixels(10);
 //        }
-        borderBottomLeft.setLayoutParams(layoutParams);
-        layout.addView(borderBottomLeft);
-    }
+//        borderBottomLeft.setLayoutParams(layoutParams);
+//        layout.addView(borderBottomLeft);
+    	int width = getResources().getDisplayMetrics().widthPixels;
+    	int height = getResources().getDisplayMetrics().heightPixels;
+    	
+		borderBottom = new ImageView(this);
+		borderBottom.setScaleType(ScaleType.FIT_XY);
 
-    private void createBottomRightBorder() {
-        borderBottomRight = new ImageView(this);
-        //setBitmap(borderBottomRight, "border_bottom_right.png");
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
+        setBitmap(borderBottom, "overlay-bottom.png");
+        
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, height / 2 - width / 2);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-//        if (isXLargeScreen()) {
-//            layoutParams.rightMargin = dpToPixels(100);
-//        } else if (isLargeScreen()) {
-//            layoutParams.rightMargin = dpToPixels(50);
-//        } else {
-//            layoutParams.rightMargin = dpToPixels(10);
-//        }
-        borderBottomRight.setLayoutParams(layoutParams);
-        layout.addView(borderBottomRight);
+        borderBottom.setLayoutParams(layoutParams);
+        
+        layout.addView(borderBottom);
     }
 
 //    private void layoutBottomBorderImagesRespectingAspectRatio() {
@@ -176,12 +194,12 @@ public class CustomCameraActivity extends Activity {
     private void createCaptureButton() {
         captureButton = new ImageButton(getApplicationContext());
         setBitmap(captureButton, "capture_button.png");
-        captureButton.setBackgroundColor(Color.parseColor("#90226a"));
+        captureButton.setBackgroundColor(0);
         captureButton.setScaleType(ScaleType.FIT_CENTER);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, dpToPixels(75));
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        //layoutParams.bottomMargin = dpToPixels(10);
+        layoutParams.bottomMargin = dpToPixels(10);
         captureButton.setLayoutParams(layoutParams);
         captureButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -272,6 +290,29 @@ public class CustomCameraActivity extends Activity {
         } catch (Exception e) {
             Log.e(TAG, "Could load image", e);
         }
+    }
+    
+    private class SetFrameBitmapTask extends AsyncTask<String, Void, Bitmap> {
+		@Override
+		protected Bitmap doInBackground(String... urls) {
+    		try {
+    			URL newurl = new URL(urls[0]);
+    	    	Bitmap newbitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+    	    	return newbitmap;
+    		} catch (Exception e) {
+    			Log.e(TAG, "Could load image", e);
+    		}
+    		return null;
+		}
+		
+		@Override
+	    protected void onPostExecute(Bitmap result) {
+ 	    	frame.setImageBitmap(result);
+	    }
+    }
+    
+    private void setFrameBitmapRemote(String url) {
+    	new SetFrameBitmapTask().execute(url);
     }
 
     @Override

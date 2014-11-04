@@ -6,6 +6,8 @@
 /Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/CustomCameraActivity$3.class \
 /Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/CustomCameraActivity$4.class \
 /Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/CustomCameraActivity.class \
+/Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/CustomCameraPreview$LayoutMode.class \
+/Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/CustomCameraPreview$PreviewReadyCallback.class \
 /Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/CustomCameraPreview.class \
 /Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/MainActivity.class \
 /Users/sorpaas/repos/frame_camera/platforms/android/ant-build/classes/com/performanceactive/plugins/camera/R$attr.class \

@@ -29,13 +29,14 @@
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/spec.html \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/css/index.css \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay \
-/Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/logo.png \
+/Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/ionic.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/border_bottom_left.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/border_bottom_right.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/border_top_left.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/border_top_right.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/capture_button.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/capture_button_pressed.png \
+/Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/full-overlay-example.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/overlay-bottom.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/overlay-default.png \
 /Users/sorpaas/repos/frame_camera/platforms/android/assets/www/img/cameraoverlay/overlay-top.png \

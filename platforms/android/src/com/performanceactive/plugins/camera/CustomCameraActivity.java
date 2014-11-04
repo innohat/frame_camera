@@ -227,6 +227,7 @@ public class CustomCameraActivity extends Activity {
 
     private void takePicture() {
     	Camera camera = cameraPreview.getCamera();
+    	camera.setDisplayOrientation(90);
         String focusMode = camera.getParameters().getFocusMode();
         if (focusMode == FOCUS_MODE_AUTO || focusMode == FOCUS_MODE_MACRO) {
             camera.autoFocus(new AutoFocusCallback() {

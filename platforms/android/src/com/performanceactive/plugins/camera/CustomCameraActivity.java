@@ -20,10 +20,12 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -249,8 +251,15 @@ public class CustomCameraActivity extends Activity {
                 String filename = getIntent().getStringExtra(FILENAME);
                 int quality = getIntent().getIntExtra(QUALITY, 80);
                 File capturedImageFile = new File(getCacheDir(), filename);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length);
-                bitmap.compress(CompressFormat.JPEG, quality, new FileOutputStream(capturedImageFile));
+                
+                Bitmap source = BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length);
+
+                /****** Image rotation ****/
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                Bitmap cropped = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+                
+                cropped.compress(CompressFormat.JPEG, quality, new FileOutputStream(capturedImageFile));
                 Intent data = new Intent();
                 data.putExtra(IMAGE_URI, Uri.fromFile(capturedImageFile).toString());
                 setResult(RESULT_OK, data);

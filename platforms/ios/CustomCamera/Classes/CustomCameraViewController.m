@@ -19,6 +19,7 @@
     AVCaptureDevice *_rearCamera;
     AVCaptureStillImageOutput *_stillImageOutput;
     UIButton *_captureButton;
+    UIButton *_switchButton;
     UIImageView *_topOverlay;
     UIImageView *_bottomOverlay;
     UIImageView *_frameImage;
@@ -84,6 +85,15 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
     [_captureButton setImage:[UIImage imageNamed:@"www/img/cameraoverlay/capture_button_pressed.png"] forState:UIControlStateHighlighted];
     [_captureButton addTarget:self action:@selector(takePictureWaitingForCameraToFocus) forControlEvents:UIControlEventTouchUpInside];
     [overlay addSubview:_captureButton];
+    
+    _switchButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_switchButton setImage:[UIImage imageNamed:@"www/img/cameraoverlay/switch.png"]
+                   forState:UIControlStateNormal];
+    [_switchButton setImage:[UIImage imageNamed:@"www/img/cameraoverlay/switch_pressed.png"]
+                   forState:UIControlStateHighlighted];
+    [_switchButton addTarget:self action:@selector(switchCameraTapped)
+            forControlEvents:UIControlEventTouchUpInside];
+    [overlay addSubview:_switchButton];
 
     return overlay;
 }
@@ -103,6 +113,12 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
                                    bounds.size.width, (bounds.size.height - bounds.size.width) / 2);
     _bottomOverlay.frame = CGRectMake(0, (bounds.size.width + bounds.size.height) / 2 ,
                                       bounds.size.width, (bounds.size.height - bounds.size.width) / 2);
+    float switchButtonSize = 30;
+    float switchButtonMargin = ((bounds.size.height - bounds.size.width) / 2 - switchButtonSize) / 2;
+    _switchButton.frame = CGRectMake(bounds.size.width - switchButtonSize - switchButtonMargin,
+                                     switchButtonMargin,
+                                     switchButtonSize,
+                                     switchButtonSize);
 }
 
 - (void)layoutOverlayForTablet {
@@ -201,6 +217,57 @@ static const CGFloat kCaptureButtonHeightTablet = 75;
             [_activityIndicator stopAnimating];
         });
     }];
+}
+
+- (void)switchCameraTapped
+{
+    //Change camera source
+    if(_captureSession)
+    {
+        //Indicate that some changes will be made to the session
+        [_captureSession beginConfiguration];
+        
+        //Remove existing input
+        AVCaptureInput* currentCameraInput = [_captureSession.inputs objectAtIndex:0];
+        [_captureSession removeInput:currentCameraInput];
+        
+        //Get new input
+        AVCaptureDevice *newCamera = nil;
+        if(((AVCaptureDeviceInput*)currentCameraInput).device.position == AVCaptureDevicePositionBack)
+        {
+            newCamera = [self cameraWithPosition:AVCaptureDevicePositionFront];
+        }
+        else
+        {
+            newCamera = [self cameraWithPosition:AVCaptureDevicePositionBack];
+        }
+        
+        //Add input to session
+        NSError *err = nil;
+        AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:newCamera error:&err];
+        if(!newVideoInput || err)
+        {
+            NSLog(@"Error creating capture device input: %@", err.localizedDescription);
+        }
+        else
+        {
+            [_captureSession addInput:newVideoInput];
+        }
+        
+        //Commit all the configuration changes at once
+        [_captureSession commitConfiguration];
+    }
+}
+
+// Find a camera with the specified AVCaptureDevicePosition, returning nil if one is not found
+- (AVCaptureDevice *) cameraWithPosition:(AVCaptureDevicePosition) position
+{
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    for (AVCaptureDevice *device in devices)
+    {
+        if ([device position] == position) return device;
+    }
+    return nil;
 }
 
 - (AVCaptureConnection*)videoConnectionToOutput:(AVCaptureOutput*)output {
